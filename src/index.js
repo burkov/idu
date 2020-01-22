@@ -1,22 +1,27 @@
 #!/usr/bin/env node
 
 const inquirer = require('inquirer');
-const {checkPrerequisites} = require('./core');
-const {validateEditorContent} = require('./editor');
-const {editorContentToFilenames} = require('./editor');
+const { exitIfPrerequisitesNotMet, collectFilenames } = require('./godu');
+const { validateEditorContent, editorContentToFilenames } = require('./editor');
+const { prettyPrintFilenames } = require('./core');
 const program = require('commander');
-const {collectFilenames} = require('./core');
+const _ = require('lodash');
 
 const main = () => {
     program
         .version('1.0.0')
         .name('idu')
-        .option('-t, --test-mode', 'run in test mode', false);
-    program.parse(process.argv);
-    console.log(program.testMode);
-    checkPrerequisites();
-    const filenames = collectFilenames(program.testMode);
+        .option('-t, --test-mode', 'run in test mode', false)
+        .arguments('<path>');
 
+    program.parse(process.argv);
+    exitIfPrerequisitesNotMet();
+    const filenames = collectFilenames(program.testMode, program.path);
+    if (_.isEmpty(filenames)) {
+        console.log('Nothing to do, exiting.');
+        process.exit(0);
+    }
+    prettyPrintFilenames(filenames);
     inquirer.prompt([
         {
             type: 'expand',
@@ -48,7 +53,7 @@ const main = () => {
             validate: validateEditorContent,
             filter: editorContentToFilenames,
             message: 'Remove all lines from editor to cancel',
-            when: ({action}) => action === 'edit',
+            when: ({ action }) => action === 'edit',
         },
     ]).then(answers => {
         console.log(answers);

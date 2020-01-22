@@ -1,7 +1,6 @@
-const shell = require('shelljs');
-
 const fs = require('fs');
 const _ = require('lodash');
+const { sampleFilenames } = require('./test');
 
 const validateFileNames = (fileNames) => {
     debugger;
@@ -15,34 +14,32 @@ const validateFileNames = (fileNames) => {
     return true;
 };
 
-const splitLines = (s) => s.split('\n').slice(0, -1);
+const splitLines = (content) => content.split('\n').slice(0, -1);
 
-const removeDups = (fileNames) => {
-    const existingFileNames = _.filter(fileNames, fs.existsSync);
-    const statsToNames = _.map(existingFileNames, fileName => [fs.statSync(fileName), fileName]);
-    const [statsToDirs, statsToFiles] = _.partition(statsToNames, ([stats]) => stats.isDirectory());
+const joinLines = (lines) => lines.join('\n');
 
-    const [, dirs] = _.unzip(statsToDirs);
-    const [, files] = _.unzip(statsToFiles);
-
-    const filteredFiles = _.filter(files, file => _.find(dirs, dir => _.startsWith(file, dir)) === undefined);
-
-    return [...dirs, ...filteredFiles];
+const normalizeFilenames = (filenames) => {
+    const existingPaths = _.filter(filenames, fs.existsSync);
+    const isDirectory = (filename) => fs.statSync(filename).isDirectory();
+    const [ dirs, files ] = _.partition(existingPaths, isDirectory);
+    const isUnique = (filename) => _.find(dirs, dir => filename !== dir && _.startsWith(filename, dir)) === undefined;
+    const uniqueFilenames = _.filter(files, isUnique).sort();
+    const uniqueDirs = _.filter(dirs, isUnique).sort();
+    return [ ...uniqueDirs, ...uniqueFilenames ];
 };
 
 // const rawLines = shell.exec('$HOME/go/bin/godu -l 0', { silent: true }).stdout;
 
-// const files = removeDups(splitLines(rawLines));
+// const files = normalizeFilenames(splitLines(rawLines));
 
-const checkPrerequisites = () => {
 
-};
-
-const collectFilenames = (testMode = true) => {
-    console.log(`Running in test mode: ${testMode}`);
+const prettyPrintFilenames = (filenames) => {
+    filenames.forEach((f) => console.log(f));
 };
 
 module.exports = {
-    checkPrerequisites,
-    collectFilenames,
+    splitLines,
+    joinLines,
+    prettyPrintFilenames,
+    normalizeFilenames,
 };
