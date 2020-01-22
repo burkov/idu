@@ -1,0 +1,19 @@
+{
+  "name": "vdu",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bin": {
+    "vdu": "src/index.js"
+  },
+  "dependencies": {
+    "commander": "^4.1.0",
+    "inquirer": "^7.0.3",
+    "lodash": "^4.17.15",
+    "ramda": "^0.26.1",
+    "shelljs": "^0.8.3"
+  }
+}
