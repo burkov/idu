@@ -32,7 +32,7 @@ const main = async () => {
             type: 'expand',
             message: 'These files will be removed. Sure? (Yes/No/Edit/Help)',
             name: 'action',
-            default: ACTION_EDIT,
+            default: ACTION_QUIT,
             choices: [
                 {
                     key: 'y',

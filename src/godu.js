@@ -32,7 +32,7 @@ const collectFilenames = (testMode = true, path = '.') => {
     }
     const { stdout } = execGoduSilently(`-l 0 ${path}`);
     const lines = splitLines(stdout);
-    return normalizeFilenames();
+    return normalizeFilenames(lines);
 };
 
 module.exports = {
