@@ -10,9 +10,12 @@
     "vdu": "src/index.js"
   },
   "dependencies": {
+    "chalk": "^3.0.0",
     "commander": "^4.1.0",
+    "filesize": "^6.0.1",
     "inquirer": "^7.0.3",
     "lodash": "^4.17.15",
+    "nodejs-fs-utils": "^1.2.4",
     "ramda": "^0.26.1",
     "shelljs": "^0.8.3"
   }

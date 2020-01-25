@@ -6,8 +6,13 @@ const { validateEditorContent, editorContentToFilenames } = require('./editor');
 const { prettyPrintFilenames } = require('./core');
 const program = require('commander');
 const _ = require('lodash');
+const { removeFiles } = require('./core');
 
-const main = () => {
+const ACTION_REMOVE = 'remove';
+const ACTION_EDIT = 'edit';
+const ACTION_QUIT = 'quit';
+
+const main = async () => {
     program
         .version('1.0.0')
         .name('idu')
@@ -22,27 +27,27 @@ const main = () => {
         process.exit(0);
     }
     prettyPrintFilenames(filenames);
-    inquirer.prompt([
+    const answers = await inquirer.prompt([
         {
             type: 'expand',
-            message: 'These files will be removed. Sure?',
+            message: 'These files will be removed. Sure? (Yes/No/Edit/Help)',
             name: 'action',
-            default: 'edit',
+            default: ACTION_EDIT,
             choices: [
                 {
                     key: 'y',
                     name: 'Remove them',
-                    value: 'remove',
+                    value: ACTION_REMOVE,
+                },
+                {
+                    key: 'n',
+                    name: 'No, quit',
+                    value: ACTION_QUIT,
                 },
                 {
                     key: 'e',
                     name: 'Edit list',
-                    value: 'edit',
-                },
-                {
-                    key: 'q',
-                    name: 'Exit',
-                    value: 'exit',
+                    value: ACTION_EDIT,
                 },
             ],
         },
@@ -53,12 +58,20 @@ const main = () => {
             validate: validateEditorContent,
             filter: editorContentToFilenames,
             message: 'Remove all lines from editor to cancel',
-            when: ({ action }) => action === 'edit',
+            when: ({ action }) => action === ACTION_EDIT,
         },
-    ]).then(answers => {
-        console.log(answers);
-    });
+    ]);
+    switch (answers.action) {
+        case ACTION_QUIT:
+            process.exit(0);
+            break;
+        case ACTION_REMOVE:
+            removeFiles(filenames);
+            break;
+        case ACTION_EDIT:
+            console.log('Not implemented');
+            break;
+    }
 };
 
 main();
-

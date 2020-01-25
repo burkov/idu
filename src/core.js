@@ -1,6 +1,8 @@
 const fs = require('fs');
 const _ = require('lodash');
-const { sampleFilenames } = require('./test');
+const shell = require('shelljs');
+const chalk = require('chalk');
+const filesize = require('filesize');
 
 const validateFileNames = (fileNames) => {
     debugger;
@@ -18,28 +20,44 @@ const splitLines = (content) => content.split('\n').slice(0, -1);
 
 const joinLines = (lines) => lines.join('\n');
 
+const splitDirsAndFiles = (filenames) => {
+    const isDirectory = (filename) => fs.statSync(filename).isDirectory();
+    return _.partition(filenames, isDirectory);
+};
+
 const normalizeFilenames = (filenames) => {
     const existingPaths = _.filter(filenames, fs.existsSync);
-    const isDirectory = (filename) => fs.statSync(filename).isDirectory();
-    const [ dirs, files ] = _.partition(existingPaths, isDirectory);
+    const [ dirs, files ] = splitDirsAndFiles(existingPaths);
     const isUnique = (filename) => _.find(dirs, dir => filename !== dir && _.startsWith(filename, dir)) === undefined;
     const uniqueFilenames = _.filter(files, isUnique).sort();
     const uniqueDirs = _.filter(dirs, isUnique).sort();
     return [ ...uniqueDirs, ...uniqueFilenames ];
 };
 
-// const rawLines = shell.exec('$HOME/go/bin/godu -l 0', { silent: true }).stdout;
-
-// const files = normalizeFilenames(splitLines(rawLines));
-
-
 const prettyPrintFilenames = (filenames) => {
-    filenames.forEach((f) => console.log(f));
+    const [ dirs, files ] = splitDirsAndFiles(filenames);
+    dirs.forEach((name) => {
+        const out = shell.exec(`du -sh ${name}`, { silent: true }).stdout;
+        const size = out.substr(0, out.indexOf('\t')).padStart(10, ' ');
+        console.log(chalk.green(`[dir ] [${size}] ${name}`));
+    });
+    files.forEach((name) => {
+        const size = filesize(fs.statSync(name).size, { unix: true }).padStart(10, ' ');
+        console.log(`[file] [${size}] ${name}`);
+    });
+};
+
+const removeFiles = (filenames) => {
+    filenames.forEach((f) => {
+        console.log(`Removing '${f}'`);
+        shell.rm('-rf', f);
+    });
 };
 
 module.exports = {
     splitLines,
     joinLines,
+    removeFiles,
     prettyPrintFilenames,
     normalizeFilenames,
 };
