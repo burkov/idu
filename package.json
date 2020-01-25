@@ -3,11 +3,21 @@
   "version": "1.0.0",
   "description": "CLI tool for disk cleanup",
   "main": "src/index.js",
-  "keywords": ["du", "interactive", "godu", "disk", "cleaner"],
+  "keywords": [
+    "du",
+    "interactive",
+    "godu",
+    "disk",
+    "cleaner"
+  ],
   "author": "Alexander Burkov",
   "license": "ISC",
   "bin": {
     "idu": "src/index.js"
+  },
+  "repository": {
+    "url": "https://github.com/burkov/idu",
+    "type": "git"
   },
   "dependencies": {
     "chalk": "^3.0.0",
