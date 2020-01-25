@@ -1,13 +1,13 @@
 {
-  "name": "vdu",
+  "name": "idu",
   "version": "1.0.0",
-  "description": "",
+  "description": "CLI tool for disk cleanup",
   "main": "src/index.js",
-  "keywords": [],
-  "author": "",
+  "keywords": ["du", "interactive", "godu", "disk", "cleaner"],
+  "author": "Alexander Burkov",
   "license": "ISC",
   "bin": {
-    "vdu": "src/index.js"
+    "idu": "src/index.js"
   },
   "dependencies": {
     "chalk": "^3.0.0",
@@ -15,8 +15,6 @@
     "filesize": "^6.0.1",
     "inquirer": "^7.0.3",
     "lodash": "^4.17.15",
-    "nodejs-fs-utils": "^1.2.4",
-    "ramda": "^0.26.1",
     "shelljs": "^0.8.3"
   }
 }
